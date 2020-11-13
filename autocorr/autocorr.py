@@ -10,7 +10,7 @@ def autocorr(data, npoints):
         if perc % 10.0 == 0:
             print(f'{perc:5.2f}% complete')
         yy0 = dy*np.roll(dy, i)
-        AC[i] = yy0[i:(i+1+int(data.shape[0]/2))].mean()/dy.std()**2
+        AC[i] = yy0[i:(i+1+int(data.shape[0]/2))].mean()/dy[i:(i+1+int(data.shape[0]/2))].std()**2
     return AC
 
 
