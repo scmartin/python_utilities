@@ -91,11 +91,13 @@ def file2xml(f):
     line = f.readline()
 
     # iterate through bonds
+    bondcount = 1
     while "Nr of off-diagonal" not in line:
         count = 0
         splitLine = line.split()
         elems = [atoms.find(f"./atom[@order='{etype}']").text for etype in splitLine[:2]]
         bond = et.SubElement(bonds, "bond")
+        bond.set("order",str(bondcount))
         for ind,elem in enumerate(elems):
             atom = et.SubElement(bond, "atom")
             atom.set('order', str(ind))
@@ -111,6 +113,7 @@ def file2xml(f):
             p = et.SubElement(bond, "param") 
             p.set("order", str(count))
             p.text = item
+        bondcount += 1
         line = f.readline()
     
     # generate the off-diagonal section of the xml doc
@@ -122,11 +125,13 @@ def file2xml(f):
     line = f.readline()
 
     # iterate through pairs
+    odcount = 1
     while "Nr of angles" not in line:
         count = 0
         splitLine = line.split()
         elems = [atoms.find(f"./atom[@order='{etype}']").text for etype in splitLine[:2]]
         pair = et.SubElement(od, "pair")
+        pair.set("order", str(odcount))
         for ind,elem in enumerate(elems):
             atom = et.SubElement(pair, "atom")
             atom.set('order', str(ind))
@@ -136,6 +141,7 @@ def file2xml(f):
             p = et.SubElement(pair, "param")
             p.set("order", str(count))
             p.text = item
+        odcount += 1
         line = f.readline()
     
     # generate the angles section of the xml doc
@@ -147,11 +153,13 @@ def file2xml(f):
     line = f.readline()
 
     # iterate through angles
+    anglecount = 1
     while "Nr of torsions" not in line:
         count = 0
         splitLine = line.split()
         elems = [atoms.find(f"./atom[@order='{etype}']").text for etype in splitLine[:3]]
         angle = et.SubElement(angles, "angle")
+        angle.set("order", str(anglecount))
         for ind,elem in enumerate(elems):
             atom = et.SubElement(angle, "atom")
             atom.set('order', str(ind))
@@ -161,6 +169,7 @@ def file2xml(f):
             p = et.SubElement(angle, "param")
             p.set("order", str(count))
             p.text = item
+        anglecount += 1
         line = f.readline()
     
     # generate the torsions section of the xml doc
@@ -172,11 +181,13 @@ def file2xml(f):
     line = f.readline()
 
     # iterate through torsions
+    torsioncount = 1
     while "Nr of hydrogen" not in line:
         count = 0
         splitLine = line.split()
         elems = [atoms.find(f"./atom[@order='{etype}']").text if etype != '0' else '0' for etype in splitLine[:4]]
         tors = et.SubElement(torsions, "torsion")
+        tors.set("order", str(torsioncount))
         for ind,elem in enumerate(elems):
             atom = et.SubElement(tors, "atom")
             atom.set('order', str(ind))
@@ -186,6 +197,7 @@ def file2xml(f):
             p = et.SubElement(tors, "param")
             p.set("order", str(count))
             p.text = item
+        torsioncount += 1
         line = f.readline()
 
     # generate h-bond section of xml doc
@@ -197,11 +209,13 @@ def file2xml(f):
     line = f.readline()
 
     # iterate through h-bonds
+    hbondcount = 1
     while line:
         count = 0
         splitLine = line.split()
         elems = [atoms.find(f"./atom[@order='{etype}']").text for etype in splitLine[:3]]
         hbond = et.SubElement(hbonds, "hbond")
+        hbond.set("order", str(hbondcount))
         for ind,elem in enumerate(elems):
             atom = et.SubElement(hbond, "atom")
             atom.set('order', str(ind))
@@ -211,7 +225,7 @@ def file2xml(f):
             p = et.SubElement(hbond, "param")
             p.set("order", str(count))
             p.text = item
-        
+        hbondcount += 1
         line = f.readline()
 
 
@@ -271,6 +285,4 @@ def xml2file(tree, filename):
 
 
 if __name__ == "__main__":
-    empty = genemptyXML()
-    et.dump(empty.getroot())
-
+    pass
