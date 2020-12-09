@@ -1,4 +1,5 @@
 import xml.etree.ElementTree as et
+from typing import TextIO
 
 # ToDo next: make atoms elements for multiparticle interactions
 
@@ -13,7 +14,7 @@ def genemptyXML():
     return emptyTree
 
 
-def file2xml(f):
+def file2xml(f: TextIO) -> et.ElementTree: 
     """Create xml document from ReaxFF parameter file object.
 
     Arguments:
