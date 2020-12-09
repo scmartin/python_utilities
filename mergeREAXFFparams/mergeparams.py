@@ -1,4 +1,4 @@
-import pfile2xml
+from mergeREAXFFparams import pfile2xml
 import xml.etree.ElementTree as et
 import copy
 import os

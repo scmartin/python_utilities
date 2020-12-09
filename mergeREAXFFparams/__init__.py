@@ -1,1 +1,1 @@
-from mergeREAXFFparams import pfile2xml,mergeparams
+from mergeREAXFFparams import mergeparams#, pfile2xml
