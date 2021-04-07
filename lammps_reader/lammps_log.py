@@ -41,7 +41,7 @@ def create_dframe(datafile):
         dflist.append(pd.read_csv(datafile, delim_whitespace=True, skiprows=header_list[i+1], engine='python', skipfooter=footer_list[i+1], index_col=0))
     return dflist
 
-def plotter(dframe, column, datafile):
+def plotter(dframe, column, ax):
     """ Plot the <column> from <dframe>.
     <dframe> needs to be a pandas dataframe. Use lammps_log.create_dframe(datafile)
     where datafile is the path to the LAMMPS log file to create a list of dataframes.
@@ -50,10 +50,7 @@ def plotter(dframe, column, datafile):
     import matplotlib.pyplot as plt
 
     try:
-        fig, ax = plt.subplots()
         dframe.plot(y=column, ax=ax, marker='None', linestyle='-')
-        fig.tight_layout()
-        plt.show()
     except TypeError:
         print("The data in this column is not numeric data")
 

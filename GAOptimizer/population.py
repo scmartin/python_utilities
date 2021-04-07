@@ -68,7 +68,7 @@ class population:
                     child.params.find(where).text = param
 
         #Mutate the child to widen parameters outside the parents
-        child.mutate(self._bounds, 1.0/(self._generation+1))
+        child.mutate(self._bounds, 1.0/np.sqrt(self._generation+1))
         child._fitness = self._fitnessFunc(child.params)
 
         if (child.__lt__(self._members[-1])):
