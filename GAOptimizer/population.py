@@ -1,3 +1,11 @@
+# ToDo:
+# - redesign evolution algorithm to create a new population
+#   without replacing any of the old population. Then, take
+#   top 50% of parent and child populations
+# - add threading for creating child population
+# - add convergence criteria
+#
+
 import numpy as np
 from abc import ABC, abstractmethod
 import xml.etree.ElementTree as et
