@@ -16,20 +16,40 @@ class population:
     share the same fitness function. The fitness function is to be minimized, so the most fit individual will have the lowest fitness
     value. """
     
-    def __init__(self, n_members: int, bounds, ffxml, fitnessFunction):
-        self._nMembers = n_members
+    def __init__(self, bounds, ffxml, fitnessFunction):
         self._generation = 0
         # individuals are generated with the _member initializer
         self._initialff = ffxml
-        self._members = [_member.make_member(bounds, ffxml) for i in range(n_members)]
         self._fitnessFunc = fitnessFunction
         self._bounds = bounds
-        for i in self._members:
-            i.fitness = self._fitnessFunc(i.params)
+
+    @classmethod
+    def new_population(cls, n_members: int, bounds, ffxml, fitnessFunction):
+        instant = cls(bounds, ffxml, fitnessFunction)
+        instant._nMembers = n_members
+        instant._generation = 0
+        # individuals are generated with the _member initializer
+        instant._members = [_member.make_member(bounds, ffxml, False) for i in range(n_members)]
+        for i in instant._members:
+            i.fitness = instant._fitnessFunc(i.params)
         
         # members are sorted so that the least fit member is easily accessed
-        self._members.sort(key=lambda member: member.fitness)
+        instant._members.sort(key=lambda member: member.fitness)
+        return instant
+
+    @classmethod
+    def read_population(cls, bounds, base_xml, ffxml, fitnessFunction):
+        instant = cls(bounds, base_xml, fitnessFunction)
+        # individuals are generated with the _member initializer
+        instant._members = [_member.make_member(bounds, i, True) for i in ffxml]
+        instant._nMembers = len(instant._members)
+        for i in instant._members:
+            i.fitness = instant._fitnessFunc(i.params)
         
+        # members are sorted so that the least fit member is easily accessed
+        instant._members.sort(key=lambda member: member.fitness)
+        return instant
+
     @property
     def bounds(self):
         return self._bounds
@@ -52,7 +72,8 @@ class population:
     def mutate_member(self, idx):
         """Choose a member and mutate it."""
         
-        self._members[idx].mutate(self._bounds, 1.0/(self._generation+1))
+        self._members[idx].mutate(self._bounds,
+                                  1.0/(np.log(self._generation+1)+1.0))
         self._members[idx]._fitness = self._fitnessFunc(self._members[idx].params)
         self._members.sort(key=lambda member: member.fitness)
 
@@ -62,7 +83,7 @@ class population:
         least fit current individual in the population, replace the individual with the child"""
         
         parents = np.random.randint(self._nMembers, size=2)
-        child = _member.make_member(self.bounds, self.initialff)
+        child = _member.make_member(self.bounds, self.initialff, True)
         root = self.bounds.getroot()
         for section in root:
             s_tag = section.tag
@@ -76,7 +97,7 @@ class population:
                     child.params.find(where).text = param
 
         #Mutate the child to widen parameters outside the parents
-        child.mutate(self._bounds, 1.0/np.sqrt(self._generation+1))
+        child.mutate(self._bounds, 1.0/(np.log(self._generation+1)+1.0))
         child._fitness = self._fitnessFunc(child.params)
 
         if (child.__lt__(self._members[-1])):
@@ -98,9 +119,9 @@ class _member(ABC):
     def __init__(self):
         self._fitness = 0.
 
-    def make_member(bounds,ffxml):
+    def make_member(bounds,ffxml,restart):
         creator = choose_type(bounds)
-        return(creator(bounds,ffxml))
+        return(creator(bounds,ffxml,restart))
     
     def __gt__(self, othermember):
         """Define greater-than comparison function."""
@@ -147,7 +168,7 @@ class reaxFF_member(_member):
     """Parameters are defined by a nested dictionary and xml representation of
     the forcefield file"""
 
-    def __init__(self, bounds, ffxml):
+    def __init__(self, bounds, ffxml, restart):
         super().__init__()
         self._chromosome = []
         self.params = copy.deepcopy(ffxml)
@@ -158,12 +179,13 @@ class reaxFF_member(_member):
                 i_tag = interaction.tag
                 i_attrib = f'[@order="{interaction.get("order")}"]'
                 for group in interaction:
-                    lower = float(group.get("lower"))
-                    upper = float(group.get("upper"))
-                    param = lower + np.random.random()*(upper - lower)
                     where = f'./{s_tag}/{i_tag}{i_attrib}/{group.tag}[@order="{group.get("order")}"]'
                     self._chromosome.append(where)
-                    self.params.find(where).text = str(param)
+                    if not restart:
+                        lower = float(group.get("lower"))
+                        upper = float(group.get("upper"))
+                        param = lower + np.random.random()*(upper - lower)
+                        self.params.find(where).text = str(param)
         
     @property
     def chromosome(self):
