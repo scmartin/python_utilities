@@ -91,7 +91,7 @@ class population:
         for whichmember in range(self.nMembers):
             children.append(self.mate())
         children.sort(key=lambda member: member.fitness)
-        self._members = [self._members[:self.nMembers//2]] + children[:(self.nMembers+1)//2]
+        self._members = self._members[:self.nMembers//2] + children[:(self.nMembers+1)//2]
         self._members.sort(key=lambda member: member.fitness)
         self._generation += 1
 
