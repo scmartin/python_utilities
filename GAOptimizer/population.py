@@ -99,17 +99,21 @@ class population:
         #Mutate the child to widen parameters outside the parents
         child.mutate(self._bounds, 1.0/(np.log(self._generation+1)+1.0))
         child._fitness = self._fitnessFunc(child.params)
-
-        if (child.__lt__(self._members[-1])):
-            self._members[-1] = child
+        return child
+        # if (child.__lt__(self._members[-1])):
+        #     self._members[-1] = child
         
-        self._members.sort(key=lambda member: member.fitness)
+        # self._members.sort(key=lambda member: member.fitness)
     
     def evolve(self):
         """Move the population forward a generation by creating population.nMembers new potential children.
         Whether children survive is determined by the population.mate() function."""
+        children = []
         for whichmember in range(self.nMembers):
-            self.mate()
+            children.append(self.mate())
+        children.sort(key=lambda member: member.fitness)
+        self._members = self._members[:self.nMembers//2] + children[:(self.nMembers+1)//2]
+        self._members.sort(key=lambda member: member.fitness)
         self._generation += 1
 
 
