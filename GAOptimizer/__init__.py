@@ -1,1 +1,1 @@
-from GAOptimizer import population
+from GAOptimizer import population,GAopt

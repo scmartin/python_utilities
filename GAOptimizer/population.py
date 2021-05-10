@@ -73,7 +73,7 @@ class population:
         """Choose a member and mutate it."""
         
         self._members[idx].mutate(self._bounds,
-                                  1.0/(np.log(self._generation+1)+1.0))
+                                  1.0/np.sqrt(np.log((self._generation+1)/2.0)+1.0))
         self._members[idx]._fitness = self._fitnessFunc(self._members[idx].params)
         self._members.sort(key=lambda member: member.fitness)
 
@@ -97,7 +97,7 @@ class population:
                     child.params.find(where).text = param
 
         #Mutate the child to widen parameters outside the parents
-        child.mutate(self._bounds, 1.0/(np.log(self._generation+1)+1.0))
+        child.mutate(self._bounds, 1.0)
         child._fitness = self._fitnessFunc(child.params)
         return child
         # if (child.__lt__(self._members[-1])):
